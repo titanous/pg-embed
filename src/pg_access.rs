@@ -61,9 +61,13 @@ impl PgAccess {
     pub async fn new(
         fetch_settings: &PgFetchSettings,
         database_dir: &PathBuf,
+        cache_dir: Option<&PathBuf>,
     ) -> Result<Self, PgEmbedError> {
-        // cache directory
-        let cache_dir = Self::create_cache_dir_structure(&fetch_settings).await?;
+        let cache_dir = match cache_dir {
+            Some(d) => d.clone(),
+            None => Self::create_cache_dir_structure(&fetch_settings).await?,
+        };
+
         Self::create_db_dir_structure(database_dir).await?;
         // pg_ctl executable
         let mut pg_ctl = cache_dir.clone();

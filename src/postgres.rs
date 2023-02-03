@@ -35,6 +35,8 @@ use crate::{pg_fetch, pg_unpack};
 pub struct PgSettings {
     /// postgresql database directory
     pub database_dir: PathBuf,
+    // cache directory
+    pub cache_dir: Option<PathBuf>,
     /// postgresql port
     pub port: u16,
     /// postgresql user name
@@ -100,7 +102,12 @@ impl PgEmbed {
             &password,
             pg_settings.port.to_string()
         );
-        let pg_access = PgAccess::new(&fetch_settings, &pg_settings.database_dir).await?;
+        let pg_access = PgAccess::new(
+            &fetch_settings,
+            &pg_settings.database_dir,
+            pg_settings.cache_dir.as_ref(),
+        )
+        .await?;
         Ok(PgEmbed {
             pg_settings,
             fetch_settings,
